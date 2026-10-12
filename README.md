@@ -26,8 +26,8 @@ A lightweight, zero-dependency Node.js utility that extracts complete, multi-pos
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/bluesky-thread-collator.git
-   cd bluesky-thread-collator
+   git clone https://github.com/pwn20/bluesky-thread-saver.git
+   cd bluesky-thread-saver
    ```
 
 2. **Run the script with any public Bluesky post URL:**
@@ -71,4 +71,4 @@ The script generates two files named after the post's record key (`<rkey>`):
 
 ## License
 
-[MIT](LICENSE)
+[This project is released under the [GNU GPL v3.0](https://www.gnu.org/licenses/gpl-3.0.txt).
