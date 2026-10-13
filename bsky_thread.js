@@ -6,8 +6,8 @@ async function main()
     const urlArg = process.argv[2];
     if (!urlArg)
     {
-        console.error("Error: Please provide a Bluesky post URL.");
-        console.error("Usage: node bsky_thread.js <bluesky_post_url>");
+        console.error("\x1b[31mError: Please provide a Bluesky post URL.\x1b[0m");
+        console.error("\x1b[33mUsage:\x1b[0m node bsky_thread.js <bluesky_post_url>");
         process.exit(1);
     }
 
@@ -16,7 +16,7 @@ async function main()
     const match = urlArg.match(urlPattern);
     if (!match)
     {
-        console.error("Error: Invalid Bluesky post URL format.");
+        console.error("\x1b[31mError: Invalid Bluesky post URL format.\x1b[0m");
         process.exit(1);
     }
 
@@ -24,13 +24,13 @@ async function main()
     const targetRkey = match[2];
     const sourceUrl = urlArg.trim();
 
-    console.log(`[1/5] Resolving profile and handle '${handle}' to DID...`);
+    console.log(`\x1b[36m[1/5]\x1b[0m Resolving profile and handle \x1b[1m'${handle}'\x1b[0m to DID...`);
     
     // Fetch profile data (display name, bio, DID)
     const profileRes = await fetch(`https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${handle}`);
     if (!profileRes.ok)
     {
-        console.error(`Failed to resolve actor profile: ${profileRes.statusText}`);
+        console.error(`\x1b[31mFailed to resolve actor profile:\x1b[0m ${profileRes.statusText}`);
         process.exit(1);
     }
 
@@ -40,17 +40,17 @@ async function main()
     const handleName = `@${profileData.handle}`;
     const bioText = profileData.description ? profileData.description.trim() : 'No bio available.';
 
-    console.log(`      Resolved: ${displayName} (${handleName}) -> DID: ${targetDid}`);
+    console.log(`      \x1b[32mResolved:\x1b[0m ${displayName} (\x1b[35m${handleName}\x1b[0m) -> DID: \x1b[2m${targetDid}\x1b[0m`);
 
     const startingUri = `at://${targetDid}/app.bsky.feed.post/${targetRkey}`;
-    console.log(`[2/5] Fetching initial post thread graph from public AppView endpoints...`);
+    console.log(`\x1b[36m[2/5]\x1b[0m Fetching initial post thread graph from public AppView endpoints...`);
 
     // Call getPostThread with maximum depth parameters
     const threadUrl = `https://public.api.bsky.app/xrpc/app.bsky.feed.getPostThread?uri=${encodeURIComponent(startingUri)}&depth=1000&parentHeight=1000`;
     const threadRes = await fetch(threadUrl);
     if (!threadRes.ok)
     {
-        console.error(`Failed to fetch thread: ${threadRes.statusText}`);
+        console.error(`\x1b[31mFailed to fetch thread:\x1b[0m ${threadRes.statusText}`);
         process.exit(1);
     }
 
@@ -104,7 +104,7 @@ async function main()
     const startPostObj = discoveredPostsMap.get(startingUri);
     const startTimestamp = startPostObj ? new Date(startPostObj.createdAt).getTime() : Date.now();
 
-    console.log(`[3/5] Deep-scanning author feed for additional thread chain posts...`);
+    console.log(`\x1b[36m[3/5]\x1b[0m Deep-scanning author feed for additional thread chain posts...`);
 
     let cursor = null;
     let keepPaginating = true;
@@ -179,15 +179,15 @@ async function main()
         .filter(p => validUrisInChain.has(p.uri))
         .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
-    console.log(`[4/5] Collation complete. Found ${chainPosts.length} posts in the thread.`);
+    console.log(`\x1b[36m[4/5]\x1b[0m Collation complete. Found \x1b[1m${chainPosts.length}\x1b[0m posts in the thread.`);
 
     if (chainPosts.length === 0)
     {
-        console.log("No posts found in the thread context.");
+        console.log("\x1b[33mNo posts found in the thread context.\x1b[0m");
         return;
     }
 
-    console.log(`[5/5] Generating text and HTML output files...`);
+    console.log(`\x1b[36m[5/5]\x1b[0m Generating text and HTML output files...`);
 
     // Format Text File Output
     const txtHeader = [
@@ -384,12 +384,12 @@ async function main()
     const htmlFileName = `bluesky_thread_${targetRkey}.html`;
     fs.writeFileSync(htmlFileName, htmlDocument, 'utf8');
 
-    console.log(`      Successfully written '${txtFileName}'.`);
-    console.log(`      Successfully written '${htmlFileName}'.`);
+    console.log(`      \x1b[32mSuccessfully written\x1b[0m \x1b[1m'${txtFileName}'\x1b[0m.`);
+    console.log(`      \x1b[32mSuccessfully written\x1b[0m \x1b[1m'${htmlFileName}'\x1b[0m.`);
 }
 
 main().catch(error =>
 {
-    console.error("An unexpected error occurred:", error);
+    console.error("\x1b[31mAn unexpected error occurred:\x1b[0m", error);
     process.exit(1);
 });
